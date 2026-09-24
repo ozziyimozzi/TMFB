@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E8731E">
+<title>TMFB Başvuru Hazırlayıcı</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TMFB Başvuru">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap&subset=latin-ext" rel="stylesheet">
+<style>
+:root{
+  --bg:#E8ECEF;--panel:#FFFFFF;--ink:#17222D;--muted:#5A6875;--rule:#C9D1D8;--field:#F6F8F9;
+  --accent:#E8731E;--accent-ink:#FFFFFF;--accent-soft:#FBE3D0;--ok:#2E7A57;--err:#B63A1B;
+  --plate-line:#17222D;
+  --sans:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --cond:"Barlow Semi Condensed","Barlow",system-ui,"Arial Narrow",Arial,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10171D;--panel:#18222B;--ink:#E4EAEF;--muted:#93A2AF;--rule:#2C3A46;--field:#121B22;
+  --accent:#F08A3E;--accent-ink:#1A0E05;--accent-soft:#3A2414;--ok:#58B389;--err:#F07B5E;--plate-line:#10171D;
+}}
+:root[data-theme="dark"]{
+  --bg:#10171D;--panel:#18222B;--ink:#E4EAEF;--muted:#93A2AF;--rule:#2C3A46;--field:#121B22;
+  --accent:#F08A3E;--accent-ink:#1A0E05;--accent-soft:#3A2414;--ok:#58B389;--err:#F07B5E;--plate-line:#10171D;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* header */
+.top{display:flex;align-items:center;gap:16px;padding:14px 24px;border-bottom:1px solid var(--rule);background:var(--panel)}
+.plate{flex:none;width:58px;height:40px;background:var(--accent);border:3px solid var(--plate-line);border-radius:3px;display:grid;grid-template-rows:1fr 1fr;font:700 11px/1 var(--cond);color:#17222D;text-align:center;letter-spacing:.02em}
+.plate span{display:flex;align-items:center;justify-content:center}
+.plate span+span{border-top:2px solid var(--plate-line)}
+.top h1{margin:0;font:600 21px/1.15 var(--cond)}
+.top p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.top .grow{flex:1;min-width:0}
+.saved{font-size:13px;color:var(--muted);white-space:nowrap}
+
+.shell{display:grid;grid-template-columns:250px minmax(0,1fr);gap:0;max-width:1320px;margin:0 auto}
+nav.steps{padding:24px 16px;position:sticky;top:0;align-self:start}
+nav.steps ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+nav.steps button{width:100%;display:flex;gap:12px;align-items:center;padding:9px 10px;border:0;background:none;border-radius:6px;text-align:left;cursor:pointer;color:var(--muted)}
+nav.steps button:hover{background:var(--panel);color:var(--ink)}
+nav.steps .n{flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--rule);display:grid;place-items:center;font:600 13px/1 var(--cond)}
+nav.steps .t{font-weight:500;line-height:1.25}
+nav.steps .t small{display:block;font-weight:400;font-size:12.5px;color:var(--muted)}
+nav.steps li.done .n{background:var(--ok);border-color:var(--ok);color:#fff}
+nav.steps li.part .n{border-color:var(--ok);color:var(--ok)}
+nav.steps li.cur button{background:var(--panel);color:var(--ink);box-shadow:inset 3px 0 0 var(--accent)}
+nav.steps li.cur .n{border-color:var(--accent);color:var(--accent)}
+nav.steps li.cur.done .n{color:#fff}
+
+main{padding:24px 24px 64px;min-width:0}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:28px 32px;max-width:920px}
+.panel.wide{max-width:none}
+.panel>h2{margin:0 0 4px;font:600 28px/1.15 var(--cond)}
+.panel>.lead{margin:0 0 24px;color:var(--muted);max-width:68ch}
+h3{font:600 18px/1.2 var(--cond);margin:28px 0 12px}
+h3:first-child{margin-top:0}
+.grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px 16px}
+.c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}.c6{grid-column:1/-1}.c1{grid-column:span 1}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:14px;font-weight:500}
+label.f .opt{font-weight:400;color:var(--muted)}
+.f input,.f select,.f textarea{width:100%;border:1px solid var(--rule);background:var(--field);border-radius:5px;padding:8px 10px;font-weight:400;font-size:15px;min-height:40px}
+.f textarea{min-height:96px;resize:vertical;line-height:1.45}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+.hint{font-weight:400;font-size:13px;color:var(--muted)}
+.err{display:none;font-weight:400;font-size:13px;color:var(--err)}
+input[aria-invalid="true"]{border-color:var(--err)!important}
+input[aria-invalid="true"]~.err{display:block}
+
+/* choice chips / segmented */
+fieldset{border:0;margin:0;padding:0;min-width:0}
+legend{font-size:14px;font-weight:500;padding:0;margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--rule);border-radius:999px;font-size:14px;background:var(--field);cursor:pointer;user-select:none}
+.chip input:checked+span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.chip.sq span{border-radius:5px}
+
+/* repeating cards */
+.card{border:1px solid var(--rule);border-radius:7px;padding:18px 18px 16px;margin-bottom:14px;background:var(--panel)}
+.card-h{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.card-h .idx{font:600 15px/1 var(--cond);color:var(--muted)}
+.card-h .ttl{font:600 17px/1.2 var(--cond);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qty{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:14px}
+.qty label.f input{text-align:right;font-variant-numeric:tabular-nums}
+details.sub{margin-top:14px;border-top:1px dashed var(--rule);padding-top:10px}
+details.sub summary{cursor:pointer;font-weight:500;font-size:15px;padding:4px 0}
+details.sub summary .hint{margin-left:6px}
+.subgrid{display:grid;gap:12px;padding:10px 0 4px}
+
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);background:var(--panel);border-radius:6px;padding:8px 14px;font-weight:500;font-size:15px;cursor:pointer;min-height:40px}
+.btn:hover{border-color:var(--ink)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.pri:hover{filter:brightness(1.05)}
+.btn.ghost{border-color:transparent;background:none;color:var(--muted);padding:6px 8px;min-height:32px;font-size:14px}
+.btn.ghost:hover{color:var(--ink);border-color:var(--rule)}
+.btn.danger:hover{color:var(--err)}
+.btn.warn{border-color:var(--err);color:var(--err)}
+.add{width:100%;justify-content:center;border-style:dashed;color:var(--muted)}
+.add:hover{color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid var(--rule)}
+
+.totals{display:grid;grid-template-columns:auto repeat(6,minmax(0,1fr));gap:4px 12px;align-items:baseline;border:1px solid var(--rule);border-radius:7px;padding:12px 16px;margin:6px 0 18px;background:var(--field);font-size:14px}
+.totals b{display:block;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;font-size:15px}
+.totals .lb{color:var(--muted);text-align:right;font-size:12.5px}
+.totals .h{font:600 15px var(--cond)}
+
+.q{padding:14px 0;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 20px;align-items:center}
+.q p{margin:0}
+.q .note{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.q .extra{grid-column:1/-1}
+.q:last-of-type{border-bottom:0}
+
+.fk{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.status{font-size:13px;color:var(--muted)}
+
+.empty{border:1px dashed var(--rule);border-radius:7px;padding:28px;text-align:center;color:var(--muted);margin-bottom:14px}
+
+/* preview */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px}
+.toolbar .sep{flex:1}
+.missing{margin:14px 0 18px;padding:12px 16px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0;font-size:14px}
+.missing ul{margin:6px 0 0;padding-left:18px}
+.missing button{border:0;background:none;padding:0;color:inherit;text-decoration:underline;cursor:pointer;font-size:14px}
+.docs{overflow-x:auto;padding:8px 0 24px;display:flex;flex-direction:column;align-items:center;gap:18px;background:var(--bg);border-radius:6px}
+.docs .page{box-shadow:0 1px 3px rgba(20,30,40,.18),0 8px 24px rgba(20,30,40,.10)}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:10px 16px;border-radius:6px;font-size:14px;display:flex;gap:14px;align-items:center;z-index:10;max-width:calc(100vw - 32px)}
+.toast button{background:none;border:0;color:var(--accent);font-weight:600;cursor:pointer;padding:0}
+.toast[hidden]{display:none}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  nav.steps{min-width:0}
+  nav.steps{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 12px;border-bottom:1px solid var(--rule);top:env(safe-area-inset-top,0px)}
+  nav.steps ol{flex-direction:row;overflow-x:auto;gap:4px;scrollbar-width:none}
+  nav.steps button{white-space:nowrap;padding:6px 10px}
+  nav.steps .t small{display:none}
+  nav.steps li.cur button{box-shadow:inset 0 -3px 0 var(--accent)}
+  main{padding:16px 12px 56px}
+  .panel{padding:20px 16px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .c1,.c2{grid-column:span 1}.c3,.c4{grid-column:1/-1}
+  .qty{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .totals{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .totals .h{grid-column:1/-1}
+  .top{padding:12px 14px}
+  .top p,.saved{display:none}
+}
+</style>
+
+<style id="doc-css">
+/* ---- printed documents ---- */
+.page{width:210mm;min-height:297mm;background:#fff;color:#000;padding:12mm 13mm 10mm;font:9.5pt/1.35 Arial,"Liberation Sans",Helvetica,sans-serif;display:flex;flex-direction:column;page:port;flex:none}
+.page.land{width:297mm;min-height:210mm;padding:9mm 10mm 8mm;page:land}
+.page *{box-sizing:border-box}
+.page table{border-collapse:collapse;width:100%}
+.page .g td,.page .g th{border:1px solid #000;padding:3px 5px;vertical-align:middle}
+.page .g th{font-weight:700;text-align:center;background:#EDEDED}
+.page .fx{table-layout:fixed}.page .fx td,.page .fx th{overflow-wrap:break-word}.page .xs th{font-size:6.6pt;padding:2px 2px;line-height:1.2}
+.page.land .sig3{margin-top:2mm;font-size:8.5pt}.page.land .sig3 div p{margin:0 0 1.2mm}.page.land .sig3 .sp{height:6mm}.page.land .sec{margin:2.5mm 0 1.5mm}.page.land .foot{margin-top:1mm}
+.page .ctr{text-align:center}.page .r{text-align:right}.page .b{font-weight:700}
+.page .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.page .sm{font-size:8pt}.page .xs{font-size:7.2pt}
+.page .cb{display:inline-block;width:3.6mm;height:3.6mm;border:1px solid #000;vertical-align:-0.6mm;margin:0 1.2mm 0 0;text-align:center;font:700 8pt/3.4mm Arial,sans-serif}
+.page .opt{display:inline-block;margin-right:5mm;white-space:nowrap}
+.page .dtitle{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:11.5pt;margin-bottom:4mm}
+.page .dtitle .c{flex:1;text-align:center}
+.page .fill{flex:1}
+.page .foot{font-size:7.8pt;margin-top:3mm}
+.page .foot p{margin:1mm 0}
+.page .sig3{display:grid;grid-template-columns:repeat(3,1fr);gap:6mm;margin-top:5mm;font-size:9pt}
+.page .sig3 div p{margin:0 0 2.5mm}
+.page .sig3 .sp{height:12mm}
+.page .ek1-addr{text-align:center;font-weight:700;font-size:12pt;margin:14mm 0 16mm;line-height:1.5}
+.page .ek1-body{font-size:11.5pt;line-height:1.75;text-indent:12mm;text-align:justify;margin:0}
+.page .sigr{margin-left:auto;margin-top:20mm;text-align:center;min-width:65mm;font-size:11pt;line-height:1.7}
+.page .kv td{padding:1.5mm 0;vertical-align:top;font-size:10.5pt}
+.page .kv td:first-child{width:62mm;font-weight:700}
+.page .sec{font-weight:700;margin:4mm 0 2mm}
+.page .para{font-size:8.8pt;line-height:1.45}
+.page .hd td{height:7mm}
+.page .shade{background:#EDEDED;font-weight:700}
+.printfile{background:#DDD;margin:0;display:flex;flex-direction:column;align-items:center;gap:10mm;padding:10mm 0}
+.printfile .pbtn{position:fixed;top:12px;right:12px;padding:10px 18px;font:600 15px Arial;background:#E8731E;color:#fff;border:0;border-radius:6px;cursor:pointer}
+@page port{size:A4 portrait;margin:0}
+@page land{size:A4 landscape;margin:0}
+@page{size:A4;margin:0}
+@media print{
+  html,body{background:#fff!important}
+  :root{padding:0!important}
+  .top,nav.steps,.toast,.panel>*:not(#docs){display:none!important}
+  .shell,main,.panel{display:block!important;padding:0!important;margin:0!important;border:0!important;max-width:none!important;background:none!important;box-shadow:none!important}
+  #docs{display:block!important;padding:0!important;background:none!important;overflow:visible!important}
+  .page{zoom:1!important;box-shadow:none!important;break-after:auto;margin:0!important;height:296.5mm;min-height:0;overflow:hidden}
+  .page.land{height:209.5mm}
+  .page+.page{break-before:page}
+  .printfile{display:block;padding:0;background:#fff}
+  .printfile .pbtn{display:none}
+  .printfile .page+.page{break-before:page}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="plate" aria-hidden="true"><span>TMFB</span><span>EK 1–3</span></div>
+  <div class="grow">
+    <h1>TMFB Başvuru Hazırlayıcı</h1>
+    <p>Tehlikeli Madde Faaliyet Belgesi dilekçe, başvuru formu ve faaliyet tespit raporu</p>
+  </div>
+  <div class="saved" id="saved" aria-live="polite"></div>
+</header>
+
+<div class="shell">
+  <nav class="steps" aria-label="Adımlar"><ol id="nav"></ol></nav>
+  <main><div id="form"></div></main>
+</div>
+<input type="file" id="loadfile" accept=".json,application/json" class="vh" tabindex="-1" aria-hidden="true">
+<div class="toast" id="toast" role="status" hidden><span id="toastmsg"></span><button id="toastbtn" hidden></button></div>
+
+<script>
+(function(){
+"use strict";
+const KEY='tmfb-taslak-v1';
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nl=v=>esc(v).replace(/\n/g,'<br>');
+
+const ISTIGAL=['AKARYAKIT / LPG İSTASYONU','FABRİKA / İMALATHANE','ŞANTİYE / MADEN OCAĞI','GERİ DÖNÜŞÜM TESİSİ / ATIK','SAĞLIK KURULUŞU','KAMU KUR. / KURULUŞU','SEVKİYAT (İRTİBAT) / LOJİSTİK / AMBAR','TURİZM / KONAKLAMA','TÜP BAYİ','TEHLİKELİ MADDE SATIŞ YERİ / BAYİ','HAZIR BETON TESİSİ','BAKIM SERVİS','DEPOLAMA / DOLUM','TAŞIMACI','DİĞER'];
+const FAAL=[['alici','Alıcı','ALICI'],['bosaltan','Boşaltan','BOŞALTAN'],['gonderen','Gönderen','GÖNDEREN'],['dolduran','Dolduran','DOLDURAN'],['yukleyen','Yükleyen','YÜKLEYEN'],['paketleyen','Paketleyen','PAKETLEYEN']];
+const KONU=[['alici','ALICI'],['bosaltan','BOŞALTAN'],['gonderen','GÖNDEREN'],['dolduran','DOLDURAN'],['paketleyen','PAKETLEYEN'],['yukleyen','YÜKLEYEN'],['tasimaci','TAŞIMACI'],['tank','TANK KONTEYNER / PORTATİF TANK İŞLETMECİSİ']];
+const SEKIL=[['tank','Tank'],['bk1','BK1'],['bk2','BK2'],['bk3','BK3'],['diger','Diğer dökme'],['ibc','IBC'],['buyuk','Büyük ambalaj'],['ambalaj','Ambalaj']];
+const TASIMA_G=[['kendi','Kendi yetki belgeli araçları'],['karsi','Gönderen tarafın araçları'],['ucuncu','Taşımacı (üçüncü taraf)']];
+const TASIMA_S=[['kendi','Kendi yetki belgeli araçları'],['karsi','Alan tarafın araçları'],['ucuncu','Taşımacı (üçüncü taraf)']];
+const Q=[
+ {k:'q5',n:5,t:'İşletme, tehlikeli madde taşımacılığı zincirinde "Taşımacı" faaliyetinde bulunuyor mu?',star:'evet'},
+ {k:'q6',n:6,t:'İşletme, tehlikeli madde taşımacılığı zincirinde "Tank konteyner/portatif tank işletmecisi" faaliyetinde bulunuyor mu?'},
+ {k:'q7',n:7,t:'İşletme, 1.4S madde ve nesneleri dışında kalan Sınıf 1 (patlayıcı madde veya nesne) tehlikeli maddelerle ilgili faaliyette bulunuyor mu?',a:1},
+ {k:'q8',n:8,t:'İşletme, ADR Kısım 1.7.1 kapsamındakiler hariç olmak üzere Sınıf 7 (radyoaktif malzeme) kapsamındaki tehlikeli maddelerle ilgili faaliyette bulunuyor mu?',a:1},
+ {k:'q9',n:9,t:"İşletme, Sınıf 6.2 ile iştigal eden ve Yönetmeliğin Ek-4'te yer alan işletmelerden midir?",a:1},
+ {k:'q10',n:10,t:'İşletme, sadece LPG / LNG / CNG alımı yapan işletme olarak mı faaliyet gösteriyor?'},
+ {k:'q11',n:11,t:'İşletmenin devredilmiş faaliyet konuları bulunuyor mu?',star:'evet'},
+ {k:'q12',n:12,t:'İşletmenin Yönetmeliğin 8. maddesi gereğince tehlikeli madde güvenlik danışmanlığı hizmeti alma zorunluluğu bulunuyor mu?',star:'hayir'}
+];
+const STEPS=[
+ ['basvuru','Başvuru','İşlem türü, tarihler'],
+ ['isletme','İşletme','Kimlik ve iletişim'],
+ ['yetkili','Yetkililer','Temsile yetkili kişiler'],
+ ['tmgdk','TMGDK','Raporu hazırlayan'],
+ ['madde','Tehlikeli maddeler','UN, miktar, geliş ve gönderim'],
+ ['muaf','ADR muafiyetleri','Bölüm 3.3, 3.4, 3.5'],
+ ['soru','Değerlendirme','Sorular 5–12, açıklama'],
+ ['belge','Belgeler','Önizle, yazdır, kaydet']
+];
+
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const newMadde=()=>({un:'',sinif:'',pg:'',kat:'',oh:'',ad:'',alici:'',bosaltan:'',gonderen:'',dolduran:'',yukleyen:'',paketleyen:'',gelis:{sekil:[],islem:'',tasima:[]},gonderim:{sekil:[],islem:'',tasima:[]}});
+const newYetkili=()=>({ad:'',gorev:'',tc:'',iletisim:'',dogum:''});
+const newMuaf=()=>({un:'',sinif:'',kat:'',g33:'',g34:'',g35:'',s33:'',s34:'',s35:''});
+function blank(){return{
+ v:1,
+ basvuru:{islem:'',birim:'',tasimaciTip:'',bolge:'I. BÖLGE MÜDÜRLÜĞÜNE',tarih:today(),raporTarihi:today(),talepAdresi:''},
+ isletme:{unvan:'',vd:'',vno:'',tmfbNo:'',mevcutFaaliyet:'',sgk:'',sicil:'',kep:'',etebligat:'',gsm:'',istel:'',eposta:'',adres:'',istigal:[],istigalDiger:''},
+ yetkililer:[newYetkili()],
+ tmgdk:{unvan:'',belgeNo:'',unetNo:'',adres:'',vd:'',vno:'',yetkiliAd:'',yetkiliTc:'',tmgdAd:'',tmgdTc:''},
+ rapor:{no:'TMFBTR-1',ilkYayin:'',revizyon:'-'},
+ maddeler:[],
+ muafiyet:{durum:'',rows:[]},
+ sorular:{q5:'',q5belge:'',q6:'',q7:'',q8:'',q9:'',q10:'',q11:'',q12:''},
+ aciklama:'',
+ faaliyet:{manual:false,sel:[]}
+}}
+function merge(base,src){ // keep shape of base, fill from src
+ if(Array.isArray(base))return Array.isArray(src)?src:base;
+ if(base&&typeof base==='object'){const o={};for(const k in base)o[k]=merge(base[k],src?src[k]:undefined);return o}
+ return src===undefined||src===null?base:src;
+}
+function normalize(s){
+ const b=merge(blank(),s);
+ b.maddeler=(b.maddeler||[]).map(m=>merge(newMadde(),m));
+ b.yetkililer=(b.yetkililer&&b.yetkililer.length?b.yetkililer:[newYetkili()]).map(y=>merge(newYetkili(),y));
+ b.muafiyet.rows=(b.muafiyet.rows||[]).map(r=>merge(newMuaf(),r));
+ return b;
+}
+
+let S=blank(), step=0, undo=null;
+try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);S=normalize(o.data);step=Math.min(o.step||0,STEPS.length-1)}}catch(e){}
+
+const getP=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
+function setP(o,p,v){const ks=p.split('.');let a=o;for(let i=0;i<ks.length-1;i++)a=a[ks[i]];a[ks[ks.length-1]]=v}
+
+function parseTR(v){
+ v=String(v??'').replace(/\s/g,'');if(!v)return 0;
+ if(v.includes(','))v=v.replace(/\./g,'').replace(',','.');
+ else if(/^\d{1,3}(\.\d{3})+$/.test(v))v=v.replace(/\./g,'');
+ const n=parseFloat(v);return isFinite(n)?n:0;
+}
+const fmt=n=>n?n.toLocaleString('tr-TR',{maximumFractionDigits:3}):'';
+const fmt0=n=>n.toLocaleString('tr-TR',{maximumFractionDigits:3});
+const dDot=d=>{if(!d)return '';const[y,m,g]=d.split('-');return `${g}.${m}.${y}`};
+const dSl=d=>{if(!d)return '';const[y,m,g]=d.split('-');return `${g}/${m}/${y}`};
+function tcOk(t){if(!/^[1-9]\d{10}$/.test(t))return false;const d=[...t].map(Number);const o=d[0]+d[2]+d[4]+d[6]+d[8],e=d[1]+d[3]+d[5]+d[7];if(((o*7-e)%10+10)%10!==d[9])return false;return d.slice(0,10).reduce((a,b)=>a+b,0)%10===d[10]}
+
+function totals(){const t={};FAAL.forEach(([k])=>t[k]=S.maddeler.reduce((a,m)=>a+parseTR(m[k]),0));return t}
+function faaliyetAuto(){const t=totals(),s=[];KONU.forEach(([k])=>{if(t[k]>0)s.push(k)});if(S.sorular.q5==='evet')s.push('tasimaci');if(S.sorular.q6==='evet')s.push('tank');return s}
+const faaliyetSel=()=>S.faaliyet.manual?S.faaliyet.sel:faaliyetAuto();
+const hasGelis=m=>m.gelis.sekil.length||m.gelis.islem||m.gelis.tasima.length;
+const hasGonderim=m=>m.gonderim.sekil.length||m.gonderim.islem||m.gonderim.tasima.length;
+const y0=()=>S.yetkililer[0]||newYetkili();
+const talepAdres=()=>S.basvuru.talepAdresi||S.isletme.adres;
+
+/* ---------- completion ---------- */
+function stepState(i){
+ const b=S.basvuru,is=S.isletme,y=y0(),t=S.tmgdk;let need=[];
+ switch(STEPS[i][0]){
+  case 'basvuru':need=[b.islem,b.birim,b.tarih,b.raporTarihi,b.bolge];break;
+  case 'isletme':need=[is.unvan,is.vd,is.vno,is.adres,is.gsm,is.istigal.length];break;
+  case 'yetkili':need=[y.ad,y.gorev,y.tc,y.iletisim];break;
+  case 'tmgdk':need=[t.unvan,t.belgeNo,t.yetkiliAd,t.tmgdAd,t.tmgdTc];break;
+  case 'madde':need=[S.maddeler.length,S.maddeler.every(m=>m.un&&m.ad)];break;
+  case 'muaf':need=[S.muafiyet.durum,S.muafiyet.durum!=='var'||S.muafiyet.rows.length];break;
+  case 'soru':need=Q.map(q=>S.sorular[q.k]);break;
+  case 'belge':return '';
+ }
+ const f=need.filter(Boolean).length;return f===need.length?'done':f?'part':'';
+}
+function missingList(){
+ const out=[];const b=S.basvuru,is=S.isletme,y=y0(),t=S.tmgdk;
+ const chk=(v,msg,s)=>{if(!v)out.push([msg,s])};
+ chk(b.islem,'İşlem türü seçilmedi',0);chk(b.birim,'Merkez / şube seçilmedi',0);
+ chk(is.unvan,'İşletme ünvanı boş',1);chk(is.vno,'Vergi numarası boş',1);chk(is.adres,'İşletme adresi boş',1);chk(is.istigal.length,'İştigal türü seçilmedi',1);
+ chk(y.ad,'Yetkili adı soyadı boş',2);chk(y.tc,'Yetkili T.C. kimlik no boş',2);
+ if(y.tc&&!tcOk(y.tc))out.push(['Yetkili T.C. kimlik no geçersiz görünüyor',2]);
+ chk(t.unvan,'TMGDK ünvanı boş',3);chk(t.tmgdAd,'Raporu hazırlayan TMGD boş',3);
+ chk(S.maddeler.length,'Hiç tehlikeli madde eklenmedi',4);
+ S.maddeler.forEach((m,i)=>{if(!m.un)out.push([`${i+1}. maddenin UN numarası boş`,4])});
+ chk(S.muafiyet.durum,'ADR muafiyeti için VAR / YOK seçilmedi',5);
+ const qm=Q.filter(q=>!S.sorular[q.k]).map(q=>q.n);if(qm.length)out.push([`Cevaplanmayan sorular: ${qm.join(', ')}`,6]);
+ return out;
+}
+
+/* ---------- form helpers ---------- */
+function F(p,label,o={}){
+ const v=getP(S,p)??'';const id='f_'+p.replace(/\./g,'_');const cls=o.c!==undefined?o.c:'c3';
+ let inp;
+ if(o.type==='textarea')inp=`<textarea id="${id}" data-p="${p}" rows="${o.rows||4}" placeholder="${esc(o.ph||'')}">${esc(v)}</textarea>`;
+ else if(o.type==='select')inp=`<select id="${id}" data-p="${p}">${o.opts.map(x=>`<option value="${esc(x)}" ${x===v?'selected':''}>${x===''?'Seçin':esc(x)}</option>`).join('')}</select>`;
+ else inp=`<input id="${id}" data-p="${p}" type="${o.type||'text'}" value="${esc(v)}" ${o.im?`inputmode="${o.im}"`:''} ${o.tc!==undefined?'data-tc maxlength="11" inputmode="numeric"':''} ${o.num?'data-num':''} ${o.ac?`autocomplete="${o.ac}"`:''} placeholder="${esc(o.ph||'')}" ${o.tc!==undefined&&v&&!tcOk(v)?'aria-invalid="true"':''}>`;
+ return `<label class="f ${cls}" for="${id}"><span>${esc(label)}${o.opt?' <span class="opt">(isteğe bağlı)</span>':''}</span>${inp}${o.tc!==undefined?'<span class="err">11 haneli geçerli bir T.C. kimlik numarası girin.</span>':''}${o.hint?`<span class="hint">${o.hint}</span>`:''}</label>`;
+}
+function R(p,opts,o={}){ // radio chips
+ const v=getP(S,p);
+ return `<div class="chips" role="radiogroup">${opts.map(([val,lab])=>`<label class="chip ${o.sq?'sq':''}"><input type="radio" name="${p}" data-p="${p}" value="${val}" ${v===val?'checked':''} ${o.rr?'data-rr':''}><span>${esc(lab)}</span></label>`).join('')}</div>`;
+}
+function C(p,opts){ // checkbox chips on array
+ const arr=getP(S,p)||[];
+ return `<div class="chips">${opts.map(([val,lab])=>`<label class="chip sq"><input type="checkbox" data-p="${p}" data-v="${val}" ${arr.includes(val)?'checked':''}><span>${esc(lab)}</span></label>`).join('')}</div>`;
+}
+const FS=(legend,inner,cls='c6')=>`<fieldset class="${cls}"><legend>${esc(legend)}</legend>${inner}</fieldset>`;
+
+/* ---------- steps ---------- */
+const V={};
+V.basvuru=()=>`
+<h2>Başvuru</h2><p class="lead">Başvurunun türünü ve belgelere basılacak tarihleri seçin. Her şube için ayrı başvuru hazırlanır.</p>
+<div class="grid">
+${FS('TMFB işlem türü',R('basvuru.islem',[['ilk','İlk başvuru'],['yenileme','Yenileme'],['degisiklik','Faaliyet konu değişikliği'],['iptal','İptal']]))}
+${FS('Başvuru yapan birim',R('basvuru.birim',[['merkez','Merkez'],['sube','Şube / temsilcilik']]),'c3')}
+${FS('Taşımacı olarak başvuru',R('basvuru.tasimaciTip',[['','Değil'],['tasimaci','Taşımacı'],['tasimaci-bosaltan','Taşımacı - Boşaltan']]),'c3')}
+${F('basvuru.bolge','Dilekçenin gideceği bölge müdürlüğü',{c:'c6',hint:'Örnek: I. BÖLGE MÜDÜRLÜĞÜNE'})}
+${F('basvuru.tarih','Dilekçe tarihi (EK-1)',{type:'date'})}
+${F('basvuru.raporTarihi','Faaliyet tespit raporu tarihi',{type:'date',hint:'EK-2 ve EK-3 dipnotlarında geçer.'})}
+${F('basvuru.talepAdresi','TMFB talep edilen adres',{type:'textarea',rows:2,c:'c6',opt:1,hint:'Boş bırakılırsa işletme adresi kullanılır.'})}
+</div>`;
+
+V.isletme=()=>`
+<h2>İşletme</h2><p class="lead">Bu bilgiler EK-1, EK-2 ve EK-3'ün tüm sayfalarına otomatik yazılır.</p>
+<div class="grid">
+${F('isletme.unvan','İşletme ünvanı',{type:'textarea',rows:2,c:'c6',ph:'Şube ise şube adıyla birlikte'})}
+${F('isletme.vd','Vergi dairesi',{c:'c3'})}
+${F('isletme.vno','Vergi numarası',{c:'c3',im:'numeric'})}
+${F('isletme.adres','İşletme adresi',{type:'textarea',rows:2,c:'c6'})}
+${F('isletme.tmfbNo','Mevcut TMFB belge no',{c:'c3',hint:'İlk başvuruda boş bırakın.'})}
+${F('isletme.mevcutFaaliyet','Belgedeki mevcut faaliyet konuları',{c:'c3',opt:1,ph:'ALICI-BOŞALTAN-GÖNDEREN…'})}
+${F('isletme.sgk','SGK işyeri sicil no',{c:'c3'})}
+${F('isletme.sicil','Ticaret / esnaf sicil no',{c:'c3'})}
+${F('isletme.kep','KEP adresi',{c:'c3'})}
+${F('isletme.etebligat','Elektronik tebligat adresi',{c:'c3'})}
+${F('isletme.gsm','Telefon (GSM)',{c:'c2',type:'tel'})}
+${F('isletme.istel','Telefon (iş)',{c:'c2',type:'tel'})}
+${F('isletme.eposta','E-posta',{c:'c2',type:'email'})}
+${FS('İşletme iştigal türü',C('isletme.istigal',ISTIGAL.map(x=>[x,x])))}
+${S.isletme.istigal.includes('DİĞER')?F('isletme.istigalDiger','Diğer iştigal türü',{c:'c6',ph:'Örnek: TERSANE'}):''}
+</div>`;
+
+V.yetkili=()=>`
+<h2>Yetkililer</h2><p class="lead">Temsile yetkili kişiler EK-2'deki tabloya yazılır. İlk sıradaki kişi dilekçeyi ve raporları imzalayan işletme yetkilisidir.</p>
+${S.yetkililer.map((y,i)=>`<div class="card"><div class="card-h"><span class="idx">${i+1}.</span><span class="ttl">${i===0?'İmzalayan işletme yetkilisi':'Ek yetkili'}</span>${i>0?`<button class="btn ghost danger" data-act="del-yetkili" data-i="${i}">Sil</button>`:''}</div>
+<div class="grid">
+${F(`yetkililer.${i}.ad`,'Adı soyadı',{c:'c3',ac:'off'})}
+${F(`yetkililer.${i}.gorev`,'Görevi',{c:'c3'})}
+${F(`yetkililer.${i}.tc`,'T.C. kimlik no',{c:'c2',tc:1})}
+${F(`yetkililer.${i}.iletisim`,'Cep telefonu',{c:'c2',type:'tel'})}
+${i===0?F(`yetkililer.${i}.dogum`,'Doğum tarihi',{c:'c2',type:'date',hint:'EK-2 imza bloğunda geçer.'}):''}
+</div></div>`).join('')}
+${S.yetkililer.length<4?`<button class="btn add" data-act="add-yetkili">Yetkili ekle</button>`:''}`;
+
+V.tmgdk=()=>`
+<h2>TMGDK</h2><p class="lead">Raporu hazırlayan danışmanlık firması ve danışman bilgileri. EK-3 sayfalarının imza bloklarında kullanılır.</p>
+<div class="grid">
+${F('tmgdk.unvan','TMGDK ünvanı',{c:'c6'})}
+${F('tmgdk.belgeNo','TMGDK belge no',{c:'c4'})}
+${F('tmgdk.unetNo','U-Net no',{c:'c2'})}
+${F('tmgdk.adres','Merkez / şube adresi ve telefon',{type:'textarea',rows:2,c:'c6'})}
+${F('tmgdk.vd','Vergi dairesi',{c:'c3'})}
+${F('tmgdk.vno','Vergi numarası',{c:'c3',im:'numeric'})}
+</div>
+<h3>İmzalayanlar</h3>
+<div class="grid">
+${F('tmgdk.tmgdAd','Raporu hazırlayan TMGD adı soyadı',{c:'c3'})}
+${F('tmgdk.tmgdTc','TMGD T.C. kimlik no',{c:'c3',tc:1})}
+${F('tmgdk.yetkiliAd','TMGDK yetkilisi adı soyadı',{c:'c3'})}
+${F('tmgdk.yetkiliTc','TMGDK yetkilisi T.C. kimlik no',{c:'c3',tc:1})}
+</div>
+<h3>Rapor eki künyesi</h3>
+<div class="grid">
+${F('rapor.no','Rapor eki numarası',{c:'c2'})}
+${F('rapor.ilkYayin','İlk yayın tarihi',{c:'c2',type:'date'})}
+${F('rapor.revizyon','Revizyon tarihi',{c:'c2',hint:'Yoksa "-"'})}
+</div>`;
+
+function totalsHTML(){const t=totals();return `<div class="totals" aria-live="polite"><span class="h">Yıllık toplam (kg/lt)</span>${FAAL.map(([k,l])=>`<div><div class="lb">${l}</div><b data-total="${k}">${fmt0(t[k])}</b></div>`).join('')}</div>`}
+V.madde=()=>`
+<h2>Tehlikeli maddeler</h2><p class="lead">Her madde için UN bilgilerini ve faaliyet konusuna göre yıllık miktarı (kg/lt) girin. Alıcı ve boşaltan miktarlarına ADR 3.3, 3.4, 3.5 muafiyetli faaliyetler dahil edilmez. Geliş ve gönderim şekli, EK-3 rapor ekinin 3. ve 4. tablolarına yazılır.</p>
+${totalsHTML()}
+${S.maddeler.length?'':`<div class="empty">Henüz madde yok. İlk maddeyi ekleyerek başlayın.</div>`}
+${S.maddeler.map((m,i)=>`<div class="card" id="m${i}"><div class="card-h"><span class="idx">${i+1}.</span><span class="ttl" data-mt="${i}">${esc(mTitle(m))}</span>
+<button class="btn ghost" data-act="dup-madde" data-i="${i}">Kopyala</button><button class="btn ghost danger" data-act="del-madde" data-i="${i}">Sil</button></div>
+<div class="grid">
+${F(`maddeler.${i}.un`,'UN no',{c:'c1',im:'numeric',ph:'örn. 1202'})}
+${F(`maddeler.${i}.sinif`,'Sınıfı',{c:'c1',ph:'örn. 3'})}
+${F(`maddeler.${i}.pg`,'Paketleme grubu',{c:'c1',type:'select',opts:['','I','II','III','-']})}
+${F(`maddeler.${i}.kat`,'Taşıma kategorisi',{c:'c1',type:'select',opts:['','0','1','2','3','4','-']})}
+${F(`maddeler.${i}.oh`,'Özel hüküm',{c:'c2',ph:'örn. 274/335'})}
+${F(`maddeler.${i}.ad`,'Uygun sevkiyat adı',{c:'c6'})}
+</div>
+<div class="qty">${FAAL.map(([k,l])=>F(`maddeler.${i}.${k}`,l,{c:'',num:1,im:'decimal',ph:'0'})).join('')}</div>
+<details class="sub" ${hasGelis(m)?'open':''}><summary>İşletmeye geliş <span class="hint">Tablo 3, alım varsa</span></summary><div class="subgrid">
+${FS('Taşıma şekli',C(`maddeler.${i}.gelis.sekil`,SEKIL))}
+${FS('Boşaltan faaliyeti',R(`maddeler.${i}.gelis.islem`,[['İ','İşletmenin kendisi (İ)'],['D','Başka işletme (D)'],['','Yok']]))}
+${FS('Taşımacılık',C(`maddeler.${i}.gelis.tasima`,TASIMA_G))}
+</div></details>
+<details class="sub" ${hasGonderim(m)?'open':''}><summary>İşletmeden gönderim <span class="hint">Tablo 4, gönderen faaliyeti varsa</span></summary><div class="subgrid">
+${FS('Gönderim şekli',C(`maddeler.${i}.gonderim.sekil`,SEKIL))}
+${FS('Yükleme faaliyeti',R(`maddeler.${i}.gonderim.islem`,[['İ','İşletmenin kendisi (İ)'],['D','Başka işletme (D)'],['','Yok']]))}
+${FS('Taşımacılık',C(`maddeler.${i}.gonderim.tasima`,TASIMA_S))}
+</div></details>
+</div>`).join('')}
+<button class="btn add" data-act="add-madde">Madde ekle</button>`;
+const mTitle=m=>[m.un&&('UN '+m.un),m.ad].filter(Boolean).join('  ')||'Yeni madde';
+
+V.muaf=()=>`
+<h2>ADR muafiyetleri</h2><p class="lead">İşletmenin ADR Bölüm 3.3 (özel hüküm), 3.4 veya 3.5 muafiyetleri kapsamında faaliyeti var mı? VAR ise tabloya yıllık miktarları girin.</p>
+${FS('Muafiyet kapsamında faaliyet',R('muafiyet.durum',[['var','Var'],['yok','Yok']],{rr:1}))}
+${S.muafiyet.durum==='var'?`<div style="margin-top:20px">
+${S.muafiyet.rows.map((r,i)=>`<div class="card"><div class="card-h"><span class="idx">${i+1}.</span><span class="ttl">${esc(r.un?'UN '+r.un:'Yeni satır')}</span><button class="btn ghost danger" data-act="del-muaf" data-i="${i}">Sil</button></div>
+<div class="grid">${F(`muafiyet.rows.${i}.un`,'UN no',{c:'c2',im:'numeric'})}${F(`muafiyet.rows.${i}.sinif`,'Sınıfı',{c:'c2'})}${F(`muafiyet.rows.${i}.kat`,'Taşıma kategorisi',{c:'c2',type:'select',opts:['','0','1','2','3','4','-']})}</div>
+<h3 style="margin:16px 0 8px;font-size:15px">İşletmeye gelen (kg/lt/yıl)</h3>
+<div class="grid">${F(`muafiyet.rows.${i}.g33`,'ADR 3.3 - ÖH',{c:'c2',num:1,im:'decimal'})}${F(`muafiyet.rows.${i}.g34`,'ADR 3.4',{c:'c2',num:1,im:'decimal'})}${F(`muafiyet.rows.${i}.g35`,'ADR 3.5',{c:'c2',num:1,im:'decimal'})}</div>
+<h3 style="margin:16px 0 8px;font-size:15px">İşletmeden gönderilen (kg/lt/yıl)</h3>
+<div class="grid">${F(`muafiyet.rows.${i}.s33`,'ADR 3.3 - ÖH',{c:'c2',num:1,im:'decimal'})}${F(`muafiyet.rows.${i}.s34`,'ADR 3.4',{c:'c2',num:1,im:'decimal'})}${F(`muafiyet.rows.${i}.s35`,'ADR 3.5',{c:'c2',num:1,im:'decimal'})}</div>
+</div>`).join('')}
+<button class="btn add" data-act="add-muaf">Satır ekle</button></div>`:''}`;
+
+V.soru=()=>{
+ const sel=faaliyetSel();
+ return `<h2>Değerlendirme</h2><p class="lead">Rapor ekinin 3. sayfasındaki soruları cevaplayın, açıklamayı yazın ve tespit edilen faaliyet konularını kontrol edin.</p>
+${Q.map(q=>`<div class="q"><p><b>${q.n}.</b> ${esc(q.t)}</p>${R('sorular.'+q.k,[['evet','Evet'],['hayir','Hayır']],{sq:1,rr:q.k==='q5'||q.k==='q6'?1:0})}
+${q.k==='q5'&&S.sorular.q5==='evet'?`<div class="extra">${F('sorular.q5belge','Taşıma yetki belgesi numarası',{c:''})}</div>`:''}
+${q.a?`<p class="note">EVET ise: İşlem yapılan miktara bakılmaksızın TMFB zorunludur; 1–4. tabloların faaliyetlere uygun doldurulması gerekir.</p>`:''}
+${q.k==='q11'?`<p class="note">İlk defa yapılan başvurularda işaretlenmez. Devredilmiş faaliyet konularını açıklamada belirtin.</p>`:''}
+${q.k==='q12'?`<p class="note">Yönetmeliğin 8. maddesinin ilgili bentlerini açıklamada gösterin.</p>`:''}
+</div>`).join('')}
+<h3>Açıklama</h3>
+<div class="grid">${F('aciklama','Açıklama metni',{type:'textarea',rows:9,c:'c6',hint:'Boşaltan / yükleyen (İ/D), devredilen faaliyetler ve danışmanlık zorunluluğu gerekçeleri burada belirtilir. Her maddeyi yeni satıra yazın.'})}</div>
+<h3>İşletmede tespit edilen faaliyet konuları</h3>
+<p class="status" id="fkstatus">${S.faaliyet.manual?'Elle düzenlendi. <button class="btn ghost" data-act="fk-reset">Miktarlara göre yeniden hesapla</button>':'Miktar tablosu ve 5–6. sorulara göre otomatik işaretlendi. Tıklayarak değiştirebilirsiniz.'}</p>
+<div class="fk">${KONU.map(([k,l])=>`<label class="chip sq"><input type="checkbox" data-fk="${k}" ${sel.includes(k)?'checked':''}><span>${esc(l)}</span></label>`).join('')}</div>`;
+};
+
+V.belge=()=>{
+ const miss=missingList();
+ return `<h2>Belgeler</h2><p class="lead">Altı sayfa, girdiğiniz bilgilerle dolduruldu. Yazdırırken hedef olarak "PDF olarak kaydet" seçebilirsiniz. Yazdırma penceresi açılmazsa dosyayı indirip tarayıcıda açın.</p>
+<div class="toolbar">
+<button class="btn pri" data-act="print">Yazdır / PDF</button>
+<button class="btn" data-act="dl-print">Yazdırılabilir dosyayı indir</button>
+<span class="sep"></span>
+<button class="btn" data-act="save-json">Taslağı dosyaya kaydet</button>
+<button class="btn" data-act="load-json">Taslak dosyası aç</button>
+<button class="btn warn" data-act="reset" id="resetbtn">Yeni başvuru</button>
+</div>
+${miss.length?`<div class="missing"><b>Eksik görünen alanlar</b> (yine de yazdırabilirsiniz):<ul>${miss.map(([m,s])=>`<li><button data-act="go" data-s="${s}">${esc(m)}</button></li>`).join('')}</ul></div>`:''}
+<div class="docs" id="docs">${docs()}</div>`;
+};
+
+/* ---------- documents ---------- */
+const cb=on=>`<span class="cb">${on?'X':''}</span>`;
+const opt=(on,l)=>`<span class="opt">${cb(on)}${l}</span>`;
+function footRapor(){const d=dSl(S.basvuru.raporTarihi)||'..../..../......';return `<div class="foot"><p>*  İş bu belge ${d} Tarihli Tehlikeli Madde Faaliyet Tespit Raporunun ( Ek - 3 ) Yönetmeliğin 10 uncu maddesinin beşinci fıkrası gereğince hazırlanan ekidir.</p><p>*  İşletmenin tehlikeli madde faaliyetlerinde herhangi bir değişiklik olması durumunda Ek - 3 raporunun ve ekinin değiştirilmesi ve BAKANLIĞA bildirilmesi zorunludur.</p></div>`}
+function sig3(lastLabel='İmza ve İşletme Kaşe:',firstLabel='İmza ve TMGDK Kaşe:'){const t=S.tmgdk,y=y0();
+ const col=(h,tc,ad,imza)=>`<div><p class="b">${h}</p><p>T.C: ${esc(tc)}</p><p>Adı Soyadı: ${esc(ad)}</p><p>${imza}</p><div class="sp"></div></div>`;
+ return `<div class="sig3">${col('Raporu Hazırlayan TMGD',t.tmgdTc,t.tmgdAd,firstLabel)}${col('TMGDK Yetkilisi',t.yetkiliTc,t.yetkiliAd,firstLabel)}${col('İşletme Yetkilisi',y.tc,y.ad,lastLabel)}</div>`}
+function konuGrid(){const s=faaliyetSel();const c=k=>opt(s.includes(k),KONU.find(x=>x[0]===k)[1]);
+ return `<table class="g"><tr><td rowspan="3" class="b" style="width:34%">İşletmede Tespit Edilen<br>Faaliyet Konuları</td><td>${c('alici')}</td><td>${c('bosaltan')}</td><td>${c('gonderen')}</td><td>${c('dolduran')}</td></tr><tr><td>${c('paketleyen')}</td><td>${c('yukleyen')}</td><td colspan="2">${c('tasimaci')}</td></tr><tr><td colspan="4">${c('tank')}</td></tr></table>`}
+function isletmeKV(withFaal){const is=S.isletme,y=y0();
+ const rows=[['İşletmenin Ünvanı',nl(is.unvan)],['Vergi Dairesi ve Numarası',esc([is.vd,is.vno].filter(Boolean).join(' - '))],['İşletme Adresi',nl(is.adres)],
+  withFaal?['TMFB Numarası ve Faaliyet Konuları ile Varsa Taşıma Yetki Belgesi Numarası',esc(is.tmfbNo)+(is.mevcutFaaliyet?'<br>'+esc(is.mevcutFaaliyet):'')+(S.sorular.q5belge?'<br>Yetki Belgesi: '+esc(S.sorular.q5belge):'')]:['TMFB Numarası<br><span class="xs">İlk TMFB başvurusunda TMFB numarası yazılmaz.</span>',esc(is.tmfbNo)],
+  ['İşletme Yetkilisi<br><span class="xs">Adı / İletişim Bilgileri / Tel.</span>',esc([y.ad,y.iletisim,talepAdres()].filter(Boolean).join(' / '))]];
+ return rows.map(([a,b])=>`<tr><td class="b" style="width:38%">${a}</td><td>${b}</td></tr>`).join('');
+}
+function ek1(){const b=S.basvuru,y=y0();
+ return `<section class="page"><div class="dtitle"><span>EK - 1</span><span style="font-weight:400">${dDot(b.tarih)}</span></div>
+<div class="ek1-addr">ULAŞTIRMA VE ALTYAPI BAKANLIĞI<br>${esc(b.bolge)}</div>
+<p class="ek1-body">İşletmemiz tehlikeli madde faaliyetlerinde bulunmaktadır. Bakanlığınız tarafından yayımlanan Tehlikeli Maddelerin Karayolu ile Taşınması Hakkında Yönetmelik gereği alınması zorunlu olan Tehlikeli Madde Faaliyet Belgesinin, (düzenlenerek/yenilenerek) tarafıma verilmesi ve dilekçe ekinde sunulan imza beyannamesi sahibi kişi/kişilerin, işletmemizin temsile yetkilisi olarak e-Devlet üzerinde işlem yapma konusunda yetkilendirilmesi hususunda, bilgilerinizi ve gereğinizi arz ederim.</p>
+<div class="sigr">İşletme Yetkilisi<br><b>${esc(y.ad)}</b><br>İmza / Kaşe</div>
+<div class="fill"></div>
+<p style="font-size:10pt">EK: ( Tehlikeli Maddelerin Karayoluyla Taşınması Hakkında Yönetmeliğin 9 uncu Maddesi uyarınca istenilen belgeler. )</p>
+<table class="kv" style="margin-top:8mm"><tr><td>Yetkili Kişi Cep Numarası:</td><td>${esc(y.iletisim||S.isletme.gsm)}</td></tr><tr><td>TMFB Talep Edilen Adres:</td><td>${nl(talepAdres())}</td></tr></table>
+</section>`}
+function ek2(){const b=S.basvuru,is=S.isletme,y=y0();const ys=S.yetkililer.slice();while(ys.length<2)ys.push(newYetkili());
+ return `<section class="page"><div class="dtitle"><span class="c">TEHLİKELİ MADDE FAALİYET BELGESİ BAŞVURU FORMU</span><span>EK - 2</span></div>
+<table class="g fx"><colgroup><col style="width:52%"><col></colgroup>
+<tr class="hd"><td>${opt(b.birim==='merkez','MERKEZ')}${opt(b.birim==='sube','( 1 ) ŞUBE / TEMSİLCİLİK')}</td><td>( 2 ) Vergi Dairesi ve No: ${esc([is.vd,is.vno].filter(Boolean).join(' - '))}</td></tr>
+<tr class="hd"><td>${opt(b.islem==='ilk','İLK BAŞVURU')}${opt(b.islem==='yenileme','YENİLEME')}${opt(b.islem==='iptal','İPTAL')}</td><td>TMFB Belge No: ${esc(is.tmfbNo)}</td></tr>
+<tr class="hd"><td>( 3 ) ${opt(b.tasimaciTip==='tasimaci','TAŞIMACI')}${opt(b.tasimaciTip==='tasimaci-bosaltan','TAŞIMACI - BOŞALTAN')}</td><td>SGK İşyeri Sicil No: ${esc(is.sgk)}</td></tr>
+<tr class="hd"><td rowspan="3" style="vertical-align:top"><b>İŞLETME ÜNVANI:</b><br>${nl(is.unvan)}</td><td>( 4 ) Ticaret / Esnaf Sicil No: ${esc(is.sicil)}</td></tr>
+<tr class="hd"><td>KEP Adresi: ${esc(is.kep)}</td></tr><tr class="hd"><td>Elektronik Tebligat Adresi: ${esc(is.etebligat)}</td></tr>
+<tr class="hd"><td rowspan="3" style="vertical-align:top"><b>İŞLETME ADRESİ:</b><br>${nl(is.adres)}</td><td>Telefon ( GSM ): ${esc(is.gsm)}</td></tr>
+<tr class="hd"><td>Telefon ( İş ): ${esc(is.istel)}</td></tr><tr class="hd"><td>E-Posta: ${esc(is.eposta)}</td></tr>
+</table>
+<table class="g" style="margin-top:4mm"><tr><th colspan="5">TEMSİLE YETKİLİ KİŞİ / KİŞİLER</th></tr>
+<tr><th style="width:9%">SIRA</th><th>ADI SOYADI</th><th>GÖREVİ</th><th>T.C. KİMLİK NO</th><th>İLETİŞİM BİLGİLERİ</th></tr>
+${ys.map((p,i)=>`<tr class="hd"><td class="ctr">${i+1}</td><td>${esc(p.ad)}</td><td>${esc(p.gorev)}</td><td class="ctr">${esc(p.tc)}</td><td class="ctr">${esc(p.iletisim)}</td></tr>`).join('')}
+</table>
+<div class="sigr" style="margin-top:10mm;font-size:10pt;line-height:1.6">İşletme Yetkilisi<br><b>${esc(y.ad)}</b><br>${esc(y.tc)}<br>${dDot(y.dogum)}<div style="height:18mm"></div></div>
+<div class="fill"></div>
+<div class="foot"><p>( 1 ) Her bir şube için ayrı form düzenlenecektir.</p><p>( 2 ) Birden fazla vergi numarasına sahip kamu kuruluşlarında varsa Genel Bütçe Vergi Numarası belirtilecektir.</p><p>( 3 ) Sadece " Taşımacı " veya " Taşımacı - Boşaltan " olarak başvuran işletmeler dolduracaktır.</p><p>( 4 ) Kuruluş mevzuatlarında Türkiye Ticaret Sicil Gazetesi'ne ilişkin hüküm bulunmayan kamu kurum ve kuruluşlarının doldurmasına gerek yoktur.</p><p>*  İş bu belge ${dSl(S.basvuru.raporTarihi)} Tarihli Tehlikeli Madde Faaliyet Tespit Raporunun ( Ek - 3 ) Yönetmeliğin 10 uncu maddesinin beşinci fıkrası gereğince hazırlanan ekidir.</p></div>
+</section>`}
+function ek3(){const b=S.basvuru,is=S.isletme,t=S.tmgdk;
+ const ist=is.istigal;
+ return `<section class="page"><div class="dtitle"><span>EK - 3</span><span class="c">TEHLİKELİ MADDE FAALİYET TESPİT RAPORU</span><span style="width:12mm"></span></div>
+<table class="g sm">
+<tr><td><b>TMFB'NİN DÜZENLENECEĞİ ADRES:</b> ${opt(b.birim==='merkez','MERKEZ ADRESİ')}${opt(b.birim==='sube','ŞUBE / TEMSİLCİLİK ADRESİ')} ( ${esc(talepAdres())} )</td></tr>
+<tr><td><b>TMFB İŞLEM TÜRÜ:</b> ${opt(b.islem==='ilk','İLK BAŞVURU')}${opt(b.islem==='yenileme','YENİLEME')}${opt(b.islem==='degisiklik','FAALİYET KONU DEĞİŞİKLİĞİ')}${opt(b.islem==='iptal','İPTAL')}</td></tr>
+<tr><td style="line-height:1.9"><b>İŞLETME İŞTİGAL TÜRÜ:</b> ${ISTIGAL.map(x=>opt(ist.includes(x),x+(x==='DİĞER'&&is.istigalDiger?' ( '+esc(is.istigalDiger)+' )':''))).join(' ')}</td></tr>
+</table>
+<div class="sec">İŞLETME BİLGİLERİ</div>
+<table class="g sm">${isletmeKV(true)}</table>
+<div class="sec">RAPORU HAZIRLAYAN TMGDK BİLGİLERİ</div>
+<table class="g sm">
+<tr><td class="b" style="width:38%">TMGDK Ünvanı</td><td>${esc(t.unvan)}</td></tr>
+<tr><td class="b">TMGDK Belge ve U-Net No</td><td>${esc(t.belgeNo)}${t.unetNo?'&nbsp;&nbsp;&nbsp; U-NET NO : '+esc(t.unetNo):''}</td></tr>
+<tr><td class="b">TMGDK Merkez / Şube Adres / Tel.</td><td>${nl(t.adres)}</td></tr>
+<tr><td class="b">TMGDK Vergi Numarası ve Yetkilisi</td><td>${esc([t.vd,t.vno].filter(Boolean).join(' / '))}${t.yetkiliAd?'&nbsp;&nbsp;&nbsp; '+esc(t.yetkiliAd):''}</td></tr>
+</table>
+<p class="para" style="margin:4mm 0">İşletmenin faaliyetleri Tehlikeli Maddelerin Karayoluyla Taşınması Hakkındaki Yönetmelik Gereği;<br>a) TMFB faaliyet konularının bu Yönetmeliğin 7 nci maddesi kapsamında UN numarasına, taşıma kategorilerine ve sınıflarına göre miktar bazında değerlendirilmesi,<br>b) İşletmenin, tehlikeli madde güvenlik danışmanlığı hizmeti alma zorunluluğunun bu Yönetmeliğinin 8 inci maddesi uyarınca değerlendirilmesi,<br>c) Tehlikeli maddelerin işletmeye hangi şekilde alındığı, boşaltıldığı, paketlendiği, yüklendiği, gönderildiği, ve/veya taşındığının değerlendirilmesi<br>ç) ADR Bölüm 3.3, 3.4 ve 3.5 kapsamında yapılan faaliyetlerin değerlendirilmesi,<br>yapılmış ve bu Yönetmeliğin 10 uncu maddesinin beşinci fıkrasında belirtilen formatta hazırlanan bilgiler ek olarak ilave edilmiştir. ( Ek zorunludur. )</p>
+<div class="fill"></div>
+<div class="sm">${konuGrid()}</div>
+${sig3()}
+${footRapor()}
+</section>`}
+function raporHead(){const r=S.rapor;return `<table style="margin-bottom:3mm"><tr><td class="b" style="font-size:11.5pt;text-align:center">TEHLİKELİ MADDE FAALİYET TESPİT RAPOR EKİ</td><td style="width:62mm"><table class="g xs"><tr><td>Numarası</td><td>${esc(r.no)}</td></tr><tr><td>İlk Yayın Tarihi</td><td>${dDot(r.ilkYayin)}</td></tr><tr><td>Revizyon Tarihi</td><td>${esc(r.revizyon)}</td></tr></table></td></tr></table>`}
+function syf1(){
+ const rows=S.maddeler.slice();while(rows.length<10)rows.push(null);const t=totals();
+ const mr=S.muafiyet.durum==='var'?S.muafiyet.rows.slice():[];while(mr.length<2)mr.push(null);
+ const mt=k=>S.muafiyet.durum==='var'?S.muafiyet.rows.reduce((a,r)=>a+parseTR(r[k]),0):0;
+ return `<section class="page">${raporHead()}
+<div class="sec">İŞLETME BİLGİLERİ</div><table class="g sm">${isletmeKV(false)}</table>
+<div class="sec">1- İşletmenin iştigal ettiği tehlikeli maddelerin faaliyet konusuna göre miktar bazında değerlendirilmesi:</div>
+<table class="g xs fx"><colgroup><col style="width:5%"><col style="width:7%"><col style="width:5.5%"><col style="width:7.5%"><col style="width:7.5%"><col style="width:8%"><col><col span="6" style="width:7.6%"></colgroup>
+<tr><th rowspan="2">Sıra No</th><th rowspan="2">UN Numarası</th><th rowspan="2">Sınıfı</th><th rowspan="2">Paketleme Grubu</th><th rowspan="2">Taşıma Kategorisi</th><th rowspan="2">Özel Hüküm</th><th rowspan="2">Uygun Sevkiyat Adı</th><th colspan="6">FAALİYET KONULARI<br>( İlgili faaliyet konusuna yıllık miktar ( kg/lt ) yazılacak )</th></tr>
+<tr><th>ALICI*</th><th>BOŞALTAN*</th><th>GÖNDEREN</th><th>DOLDURAN</th><th>YÜKLEYEN</th><th>PAKETLEYEN</th></tr>
+${rows.map((m,i)=>`<tr><td class="ctr">${i+1}</td>${m?`<td class="ctr">${esc(m.un)}</td><td class="ctr">${esc(m.sinif)}</td><td class="ctr">${esc(m.pg)}</td><td class="ctr">${esc(m.kat)}</td><td class="ctr">${esc(m.oh)}</td><td>${esc(m.ad)}</td>${FAAL.map(([k])=>`<td class="num">${fmt(parseTR(m[k]))}</td>`).join('')}`:'<td></td><td></td><td></td><td></td><td></td><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>'}</tr>`).join('')}
+<tr class="shade"><td colspan="7" class="r">Toplam Miktar</td>${FAAL.map(([k])=>`<td class="num">${fmt0(t[k])}</td>`).join('')}</tr>
+</table>
+<p class="xs" style="margin:1.5mm 0 0">* "Alıcı" ve "Boşaltan" faaliyet konularına ilişkin yapılacak miktar hesaplamasında, ADR Bölüm 3.3, 3.4 ve 3.5 muafiyetleri kapsamında yapılan faaliyetler dikkate alınmaz.</p>
+<div class="sec">2- İşletmenin varsa, ADR Bölüm 3.3, 3.4 veya 3.5 muafiyetler kapsamında faaliyetleri &nbsp;&nbsp; ${opt(S.muafiyet.durum==='var','VAR *')} ${opt(S.muafiyet.durum==='yok','YOK')}</div>
+<p class="xs" style="margin:0 0 1.5mm">* "VAR" seçeneğinin işaretlenmesi durumunda tablo doldurulacaktır.</p>
+<table class="g xs"><tr><th rowspan="2" style="width:6%">Sıra No</th><th rowspan="2">UN Numarası</th><th rowspan="2">Sınıfı</th><th rowspan="2">Taşıma Kategorisi</th><th colspan="3">İşletmeye Gelen<br>( yıllık miktar kg/lt )</th><th colspan="3">İşletmeden Gönderilen<br>( yıllık miktar kg/lt )</th></tr>
+<tr><th>ADR 3.3 - ÖH</th><th>ADR 3.4</th><th>ADR 3.5</th><th>ADR 3.3 - ÖH</th><th>ADR 3.4</th><th>ADR 3.5</th></tr>
+${mr.map((r,i)=>`<tr><td class="ctr">${i+1}</td>${r?`<td class="ctr">${esc(r.un)}</td><td class="ctr">${esc(r.sinif)}</td><td class="ctr">${esc(r.kat)}</td>${['g33','g34','g35','s33','s34','s35'].map(k=>`<td class="num">${fmt(parseTR(r[k]))}</td>`).join('')}`:'<td>&nbsp;</td>'+'<td></td>'.repeat(8)}</tr>`).join('')}
+<tr class="shade"><td colspan="4" class="r">Toplam Miktar</td>${['g33','g34','g35','s33','s34','s35'].map(k=>`<td class="num">${fmt0(mt(k))}</td>`).join('')}</tr></table>
+<div class="fill"></div>
+${sig3('İmza ve Kaşe:','İmza ve Kaşe:')}
+${footRapor()}
+</section>`}
+function flowTable(kind){
+ const G=kind==='gelis';const list=S.maddeler.filter(m=>G?(hasGelis(m)||parseTR(m.alici)>0||parseTR(m.bosaltan)>0):(hasGonderim(m)||parseTR(m.gonderen)>0||parseTR(m.yukleyen)>0));const rows=list.slice();while(rows.length<6)rows.push(null);
+ const X=on=>on?'X':'';
+ return `<table class="g xs fx"><colgroup><col style="width:3.5%"><col style="width:5.5%"><col style="width:4%"><col style="width:5.5%"><col style="width:5.5%"><col style="width:7%"><col><col span="8" style="width:4.2%"><col style="width:6.5%"><col span="3" style="width:6.5%"></colgroup>
+<tr><th rowspan="3">Sıra No</th><th rowspan="3">UN Numarası</th><th rowspan="3">Sınıfı</th><th rowspan="3">Paketleme Grubu</th><th rowspan="3">Taşıma Kategorisi</th><th rowspan="3">Özel Hüküm</th><th rowspan="3">Uygun Sevkiyat Adı</th>
+<th colspan="8">${G?'İşletmeye gelen tehlikeli maddelerin TAŞIMA şekli':'Gönderim şekli'}<br>( İlgili kısım sadece işaretlenecektir. )</th><th rowspan="3">${G?'BOŞALTAN':'YÜKLEME'} FAALİYETİ **</th><th colspan="3">${G?'İşletmeye gelen':'Gönderilen'} tehlikeli maddelerin TAŞIMACILIK faaliyeti<br>( İlgili kısım sadece işaretlenecektir. )</th></tr>
+<tr><th rowspan="2">TANK</th><th colspan="4">DÖKME</th><th colspan="3">PAKETLİ TAŞIMA</th><th rowspan="2">İşletmenin yetki belgesine kayıtlı araçları</th><th rowspan="2">Tehlikeli maddeyi ${G?'gönderen':'alan'} tarafın araçları</th><th rowspan="2">Taşımacı ( Üçüncü Taraf Araçları )</th></tr>
+<tr><th>BK1</th><th>BK2</th><th>BK3</th><th>DİĞER*</th><th>IBC</th><th>BÜYÜK AMBALAJ</th><th>AMBALAJ</th></tr>
+${rows.map((m,i)=>{if(!m)return `<tr><td class="ctr">${i+1}</td><td>&nbsp;</td>${'<td></td>'.repeat(17)}</tr>`;const f=G?m.gelis:m.gonderim;
+ return `<tr><td class="ctr">${i+1}</td><td class="ctr">${esc(m.un)}</td><td class="ctr">${esc(m.sinif)}</td><td class="ctr">${esc(m.pg)}</td><td class="ctr">${esc(m.kat)}</td><td class="ctr">${esc(m.oh)}</td><td>${esc(m.ad)}</td>${SEKIL.map(([k])=>`<td class="ctr b">${X(f.sekil.includes(k))}</td>`).join('')}<td class="ctr b">${esc(f.islem)}</td>${['kendi','karsi','ucuncu'].map(k=>`<td class="ctr b">${X(f.tasima.includes(k))}</td>`).join('')}</tr>`}).join('')}
+</table>
+<p class="xs" style="margin:1mm 0 0">* ADR Bölüm 7.3.1.1 (b) hükümlerinin geçerli olduğu dökme yük taşımaları.<br>** ${G?'Boşaltan':'Yükleyen'} işletmenin kendisi ise "İ", başka bir işletme ise "D" harfi ile belirtilir. Detayları açıklama kısmında belirtiniz.</p>`}
+function syf2(){return `<section class="page land">
+<div class="sec" style="margin-top:0">3- Tehlikeli maddelerin işletmeye hangi şekilde geldiği ( tehlikeli madde alımı varsa )</div>${flowTable('gelis')}
+<div class="sec">4- Tehlikeli maddelerin işletmeden gönderim şekli ( gönderen faaliyeti varsa )</div>${flowTable('gonderim')}
+<div class="fill"></div>${sig3('İmza ve Kaşe:','İmza ve Kaşe:')}${footRapor()}</section>`}
+function syf3(){const s=S.sorular;
+ const yn=(k,ev='EVET',hy='HAYIR')=>`&nbsp;&nbsp; ${opt(s[k]==='evet',ev)} ${opt(s[k]==='hayir',hy)}`;
+ const row=(q)=>{const ev='EVET'+(q.star==='evet'?' *':'')+(q.a?' ᵃ':''),hy='HAYIR'+(q.star==='hayir'?' *':'');
+  return `<tr><td>${q.n}- ${esc(q.t)}<div style="margin-top:1.5mm">${yn(q.k,ev,hy)}${q.k==='q5'?`&nbsp;&nbsp;&nbsp; *Taşıma Yetki Belgesi Numarası: ${esc(s.q5belge)}`:''}</div></td></tr>`};
+ return `<section class="page"><table class="g sm">
+${Q.map(row).join('')}
+<tr><td class="xs">ᵃ İşlem yapılan tehlikeli madde miktarına bakılmaksızın, iştigal ettikleri faaliyet konularına bağlı olarak TMFB almak zorunda olduğundan bu belgede düzenlenen 1, 2, 3 ve 4 üncü maddelerdeki tabloların yapılan faaliyetlere uygun olarak doldurulması zorunludur.<br>11. madde: * İlk defa TMFB başvurularında bu madde işaretlenmeyecektir. ** Devredilmiş faaliyet konularını açıklama kısmında belirtiniz.<br>12. madde: * Yönetmeliğin 8 inci maddesinin ilgili madde ve bentleri referans gösterilerek detaylı olarak açıklamasını açıklama kısmında yapınız.</td></tr>
+<tr><td style="height:70mm;vertical-align:top"><b>AÇIKLAMA:</b><br>${nl(S.aciklama)}</td></tr>
+</table>
+<div class="fill"></div>
+<div class="sm" style="margin-top:3mm">${konuGrid()}</div>
+${sig3()}${footRapor()}</section>`}
+const docs=()=>ek1()+ek2()+ek3()+syf1()+syf2()+syf3();
+
+/* ---------- render ---------- */
+function renderNav(){
+ $('#nav').innerHTML=STEPS.map(([k,t,sub],i)=>{const st=stepState(i);return `<li class="${i===step?'cur':''} ${st}"><button data-act="go" data-s="${i}" ${i===step?'aria-current="step"':''}><span class="n">${st==='done'?'✓':i+1}</span><span class="t">${t}<small>${sub}</small></span></button></li>`}).join('');
+}
+function renderStep(keepScroll){
+ const k=STEPS[step][0];
+ $('#form').innerHTML=`<div class="panel ${k==='belge'?'wide':''}">${V[k]()}
+ <div class="pager">${step>0?`<button class="btn" data-act="prev">Geri: ${STEPS[step-1][1]}</button>`:'<span></span>'}${step<STEPS.length-1?`<button class="btn pri" data-act="next">İleri: ${STEPS[step+1][1]}</button>`:''}</div></div>`;
+ renderNav();
+ if(k==='belge')fitDocs();
+ if(!keepScroll)window.scrollTo(0,0);
+}
+function fitDocs(){const box=$('#docs');if(!box)return;const w=box.clientWidth-16;const mm=3.7795;
+ box.querySelectorAll('.page').forEach(p=>{const pw=(p.classList.contains('land')?297:210)*mm;p.style.zoom=Math.min(1,w/pw)})}
+window.addEventListener('resize',()=>{if(STEPS[step][0]==='belge')fitDocs()});
+
+let saveT;
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify({step,data:S}));const d=new Date();$('#saved').textContent=`Taslak bu cihazda kaydedildi, ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`}catch(e){$('#saved').textContent='Taslak bu tarayıcıda saklanamıyor'}},300)}
+function liveUpdate(el){
+ if(STEPS[step][0]==='madde'){const t=totals();document.querySelectorAll('[data-total]').forEach(b=>b.textContent=fmt0(t[b.dataset.total]));
+  const m=el.dataset.p&&el.dataset.p.match(/^maddeler\.(\d+)\.(un|ad)$/);if(m){const s=document.querySelector(`[data-mt="${m[1]}"]`);if(s)s.textContent=mTitle(S.maddeler[+m[1]])}}
+ renderNav();
+}
+
+/* ---------- events ---------- */
+const form=$('#form');
+form.addEventListener('input',e=>{
+ const el=e.target;
+ if(el.dataset.fk!==undefined){const cur=faaliyetSel().slice();const k=el.dataset.fk;const i=cur.indexOf(k);if(el.checked&&i<0)cur.push(k);if(!el.checked&&i>=0)cur.splice(i,1);S.faaliyet={manual:true,sel:cur};save();
+  $('#fkstatus').innerHTML='Elle düzenlendi. <button class="btn ghost" data-act="fk-reset">Miktarlara göre yeniden hesapla</button>';return}
+ const p=el.dataset.p;if(!p)return;
+ if(el.type==='checkbox'){const arr=getP(S,p);const v=el.dataset.v;const i=arr.indexOf(v);if(el.checked&&i<0)arr.push(v);if(!el.checked&&i>=0)arr.splice(i,1);
+  if(p==='isletme.istigal'&&v==='DİĞER'){save();renderStep(true);return}}
+ else if(el.type==='radio'){setP(S,p,el.value);if(el.dataset.rr!==undefined){save();renderStep(true);return}}
+ else{let v=el.value;if(el.dataset.tc!==undefined){v=v.replace(/\D/g,'').slice(0,11);if(v!==el.value)el.value=v;el.setAttribute('aria-invalid',v.length===11&&!tcOk(v)?'true':'false')}setP(S,p,v)}
+ save();liveUpdate(el);
+});
+form.addEventListener('focusout',e=>{const el=e.target;if(el.dataset&&el.dataset.tc!==undefined)el.setAttribute('aria-invalid',el.value&&!tcOk(el.value)?'true':'false')});
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,i=+b.dataset.i;
+ switch(a){
+  case 'go':step=+b.dataset.s;save();renderStep();break;
+  case 'next':step=Math.min(step+1,STEPS.length-1);save();renderStep();break;
+  case 'prev':step=Math.max(step-1,0);save();renderStep();break;
+  case 'add-yetkili':S.yetkililer.push(newYetkili());save();renderStep(true);break;
+  case 'del-yetkili':remove('yetkililer',i,'Yetkili silindi');break;
+  case 'add-madde':S.maddeler.push(newMadde());save();renderStep(true);{const c=document.getElementById('m'+(S.maddeler.length-1));if(c){c.scrollIntoView({block:'center'});c.querySelector('input')?.focus()}}break;
+  case 'dup-madde':S.maddeler.splice(i+1,0,JSON.parse(JSON.stringify(S.maddeler[i])));save();renderStep(true);toast('Madde kopyalandı');break;
+  case 'del-madde':remove('maddeler',i,'Madde silindi');break;
+  case 'add-muaf':S.muafiyet.rows.push(newMuaf());save();renderStep(true);break;
+  case 'del-muaf':remove('muafiyet.rows',i,'Satır silindi');break;
+  case 'fk-reset':S.faaliyet={manual:false,sel:[]};save();renderStep(true);break;
+  case 'print':try{window.print()}catch(err){toast('Yazdırma bu görünümde açılamadı. "Yazdırılabilir dosyayı indir" ile deneyin.')}break;
+  case 'dl-print':saveFile(fname('html'),printable(),'text/html');break;
+  case 'save-json':saveFile(fname('json'),JSON.stringify({app:'tmfb-basvuru',v:1,kayit:new Date().toISOString(),data:S},null,1),'application/json');break;
+  case 'load-json':$('#loadfile').click();break;
+  case 'reset':if(b.dataset.armed){const old=JSON.stringify(S);S=blank();step=0;save();renderStep();toast('Yeni boş başvuru açıldı',{label:'Geri al',fn:()=>{S=normalize(JSON.parse(old));step=STEPS.length-1;save();renderStep()}})}
+   else{b.dataset.armed='1';b.textContent='Tüm bilgiler silinecek. Onaylamak için tekrar tıklayın';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent='Yeni başvuru'}},4000)}break;
+ }
+});
+function remove(path,i,msg){const arr=getP(S,path);const item=arr.splice(i,1)[0];save();renderStep(true);toast(msg,{label:'Geri al',fn:()=>{getP(S,path).splice(i,0,item);save();renderStep(true)}})}
+$('#loadfile').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+ try{const o=JSON.parse(await f.text());if(!o||!o.data||o.app!=='tmfb-basvuru')throw new Error('x');S=normalize(o.data);step=0;save();renderStep();toast('Taslak açıldı')}catch(err){toast('Bu dosya bir TMFB taslak dosyası değil. Uygulamadan kaydedilen .json dosyasını seçin.')}});
+
+let toastT;
+function toast(msg,action){const t=$('#toast'),btn=$('#toastbtn');$('#toastmsg').textContent=msg;
+ if(action){btn.hidden=false;btn.textContent=action.label;btn.onclick=()=>{t.hidden=true;action.fn()}}else btn.hidden=true;
+ t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,action?6500:3500)}
+
+function fname(ext){const tr={'ç':'c','ğ':'g','ı':'i','ö':'o','ş':'s','ü':'u','Ç':'C','Ğ':'G','İ':'I','Ö':'O','Ş':'S','Ü':'U'};
+ const u=(S.isletme.unvan||'isletme').replace(/[çğıöşüÇĞİÖŞÜ]/g,c=>tr[c]).replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,40);
+ return `TMFB_${u}_${S.basvuru.raporTarihi||today()}.${ext}`}
+function printable(){return `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(fname('html').replace('.html',''))}</title><style>${$('#doc-css').textContent}</style></head><body class="printfile"><button class="pbtn" onclick="window.print()">Yazdır / PDF</button>${docs()}</body></html>`}
+async function saveFile(name,data,mime){
+ let d=null;try{if(window.claude&&typeof window.claude.use==='function')d=await window.claude.use('downloads')}catch(e){}
+ if(d){try{await d.save({filename:name,data});toast('Dosya kaydedildi')}catch(err){if(err&&err.code==='declined')return;if(err&&err.code==='rate_limited'){toast('Bir kaydetme penceresi zaten açık.');return}toast('Dosya kaydedilemedi.')}return}
+ try{const url=URL.createObjectURL(new Blob([data],{type:mime+';charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000)}catch(e){toast('Dosya bu görünümde indirilemiyor.')}
+}
+window.addEventListener('beforeprint',()=>{if(STEPS[step][0]!=='belge'){step=STEPS.length-1;renderStep()}document.querySelectorAll('#docs .page').forEach(p=>p.dataset.z=p.style.zoom)});
+window.addEventListener('afterprint',fitDocs);
+
+renderStep();
+})();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>

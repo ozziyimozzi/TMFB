@@ -1,0 +1,29 @@
+TMFB Başvuru Hazırlayıcı - PWA kurulumu
+=======================================
+
+Bu klasördeki dosyaların tamamını HTTPS üzerinden yayın yapan herhangi bir
+statik barındırma hizmetine yükleyin (GitHub Pages, Netlify, Cloudflare Pages
+veya şirketinizin kendi web sunucusu). Sunucu tarafında kod gerekmez.
+
+  index.html            Uygulamanın kendisi
+  manifest.webmanifest  Uygulama adı, rengi ve simgeleri
+  sw.js                 Çevrimdışı çalışmayı sağlayan servis çalışanı
+  icons/                Ana ekran simgeleri
+
+En kolay yol (Netlify Drop):
+  1. https://app.netlify.com/drop adresini açın.
+  2. Bu klasörü sürükleyip bırakın.
+  3. Verilen adresi telefonda veya bilgisayarda açın.
+
+Uygulamayı kurmak:
+  - Android / Chrome / Edge: adres çubuğundaki "Yükle" simgesi veya menüden
+    "Uygulamayı yükle".
+  - iPhone / iPad (Safari): Paylaş > "Ana Ekrana Ekle".
+
+Notlar:
+  - İlk açılıştan sonra internet olmadan da çalışır.
+  - Girilen bilgiler yalnızca o cihazın tarayıcısında saklanır; sunucuya
+    hiçbir veri gönderilmez. Başka cihaza taşımak için "Taslağı dosyaya
+    kaydet" ve "Taslak dosyası aç" düğmelerini kullanın.
+  - Dosyayı doğrudan bilgisayardan (file://) açarsanız uygulama çalışır ama
+    kurulum ve çevrimdışı özellik devreye girmez.
